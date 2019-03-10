@@ -87,7 +87,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  admin-password: RzlPY2NXaTNLd1p4djVJblJSemdOQ1dKdlY0T090ZWVISlYyemJ6cA==
+  admin-password: MHFuaWlWQnQ1Wm9pUEpiSG92M2dNaHFuWUEzSjdwdmJIT0FjS0FVTQ==
   admin-user: YWRtaW4=
   ldap-toml: ""
 kind: Secret
