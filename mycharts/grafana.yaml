@@ -87,7 +87,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  admin-password: cmdzZmNDUjVPNUNJc1Y3MW5jaTc2VjBQVVVYWW93cktQNFpuTlQzOQ==
+  admin-password: MXR3V0ozNlRKMmZ5SW9iQ3l4THR0a1llQjJwWGYyNWJ1cWVONDllUQ==
   admin-user: YWRtaW4=
   ldap-toml: ""
 kind: Secret
@@ -124,7 +124,7 @@ metadata:
     release: grafana
   name: grafana
 spec:
-  replicas: 10
+  replicas: 50
   selector:
     matchLabels:
       app: grafana
