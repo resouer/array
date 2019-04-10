@@ -103,7 +103,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  admin-password: ZzNBZVVkNVZZdnJEQjRHNGkyejBKaVdSMms2Q0ZldlJhZUFtT3NYdA==
+  admin-password: ZHJWc0lQaFNzRXhSUFFZbWp3OHIwMjF4VEVqd29oeVduUFRseGszeQ==
   admin-user: YWRtaW4=
   ldap-toml: ""
 kind: Secret
@@ -165,7 +165,7 @@ spec:
             secretKeyRef:
               key: admin-password
               name: grafana
-        image: grafana/grafana:6.0.2
+        image: grafana/grafana:6.1.3
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 10
