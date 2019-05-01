@@ -66,6 +66,22 @@ subjects:
 ---
 apiVersion: v1
 data:
+  run.sh: |-
+    @test "Test Health" {
+      url="http://grafana/api/health"
+
+      code=$(curl -s -o /dev/null -I -w "%{http_code}" $url)
+      [ "$code" == "200" ]
+    }
+kind: ConfigMap
+metadata:
+  labels:
+    app: grafana
+    release: grafana
+  name: grafana-test
+---
+apiVersion: v1
+data:
   grafana.ini: |
     [analytics]
     check_for_updates = true
@@ -87,7 +103,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  admin-password: MXR3V0ozNlRKMmZ5SW9iQ3l4THR0a1llQjJwWGYyNWJ1cWVONDllUQ==
+  admin-password: WmFCM3VsejF3ejVCTmtJSTZad041SUNvbWhJMzhuQU5pbndwTkpKTg==
   admin-user: YWRtaW4=
   ldap-toml: ""
 kind: Secret
@@ -133,6 +149,11 @@ spec:
     type: RollingUpdate
   template:
     metadata:
+      annotations:
+        checksum/config: 9c642661a25a8049b23d4e2de43c5048a1b5f0d6d850bc8e598fa8ed7eab7e4f
+        checksum/dashboards-json-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
+        checksum/sc-dashboard-provider-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
+        checksum/secret: 44bb0648b4f61d7fef0299144d9ed14443733b4aa928b179e2490ac1ef3cb051
       labels:
         app: grafana
         release: grafana
@@ -149,7 +170,7 @@ spec:
             secretKeyRef:
               key: admin-password
               name: grafana
-        image: grafana/grafana:6.0.2
+        image: grafana/grafana:6.1.6
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 10
@@ -244,3 +265,47 @@ spec:
   - secret
   - downwardAPI
   - persistentVolumeClaim
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    helm.sh/hook: test-success
+  labels:
+    app: grafana
+    release: grafana
+  name: grafana-test
+spec:
+  containers:
+  - command:
+    - /tools/bats/bats
+    - -t
+    - /tests/run.sh
+    image: dduportal/bats:0.4.0
+    name: grafana-test
+    volumeMounts:
+    - mountPath: /tests
+      name: tests
+      readOnly: true
+    - mountPath: /tools
+      name: tools
+  initContainers:
+  - command:
+    - bash
+    - -c
+    - |
+      set -ex
+      # copy bats to tools dir
+      cp -R /usr/local/libexec/ /tools/bats/
+    image: dduportal/bats:0.4.0
+    name: test-framework
+    volumeMounts:
+    - mountPath: /tools
+      name: tools
+  restartPolicy: Never
+  volumes:
+  - configMap:
+      name: grafana-test
+    name: tests
+  - emptyDir: {}
+    name: tools
