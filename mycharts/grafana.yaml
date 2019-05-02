@@ -4,7 +4,32 @@ metadata:
   labels:
     app: grafana
     release: grafana
+  name: grafana-test
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: grafana
+    release: grafana
   name: grafana
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app: grafana
+    release: grafana
+  name: grafana-test
+rules:
+- apiGroups:
+  - policy
+  resourceNames:
+  - grafana-test
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
@@ -31,6 +56,22 @@ metadata:
     release: grafana
   name: grafana-clusterrole
 rules: []
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app: grafana
+    release: grafana
+  name: grafana-test
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: grafana-test
+subjects:
+- kind: ServiceAccount
+  name: grafana-test
+  namespace: default
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
@@ -103,7 +144,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  admin-password: WmFCM3VsejF3ejVCTmtJSTZad041SUNvbWhJMzhuQU5pbndwTkpKTg==
+  admin-password: d2pUbXNad2t3c0NES2RkbjNmb2ZaOTk1NWdmb2ZhS1RVeHdkSkFxWA==
   admin-user: YWRtaW4=
   ldap-toml: ""
 kind: Secret
@@ -150,10 +191,10 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 9c642661a25a8049b23d4e2de43c5048a1b5f0d6d850bc8e598fa8ed7eab7e4f
+        checksum/config: 80d0264530f60ab1d89465e0ac875e009f4c239193f050cd0eed02699d518d24
         checksum/dashboards-json-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
         checksum/sc-dashboard-provider-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
-        checksum/secret: 44bb0648b4f61d7fef0299144d9ed14443733b4aa928b179e2490ac1ef3cb051
+        checksum/secret: 3ac5a527cefb60751c3559e0d67b61b5383865991937a7f6b9c87af05a49967c
       labels:
         app: grafana
         release: grafana
@@ -217,6 +258,34 @@ spec:
           secretName: grafana
       - emptyDir: {}
         name: storage
+---
+apiVersion: extensions/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  labels:
+    app: grafana
+    release: grafana
+  name: grafana-test
+spec:
+  allowPrivilegeEscalation: true
+  fsGroup:
+    rule: RunAsAny
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  privileged: false
+  runAsUser:
+    rule: RunAsAny
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  volumes:
+  - configMap
+  - downwardAPI
+  - emptyDir
+  - projected
+  - secret
 ---
 apiVersion: extensions/v1beta1
 kind: PodSecurityPolicy
@@ -303,6 +372,7 @@ spec:
     - mountPath: /tools
       name: tools
   restartPolicy: Never
+  serviceAccountName: grafana-test
   volumes:
   - configMap:
       name: grafana-test
