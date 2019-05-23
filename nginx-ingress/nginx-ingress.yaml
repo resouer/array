@@ -329,7 +329,7 @@ spec:
     spec:
       containers:
       - args: []
-        image: k8s.gcr.io/defaultbackend:1.4
+        image: k8s.gcr.io/defaultbackend-amd64:1.5
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
