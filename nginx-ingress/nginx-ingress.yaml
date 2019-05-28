@@ -174,8 +174,7 @@ subjects:
   namespace: default
 ---
 apiVersion: v1
-data:
-  enable-vts-status: "false"
+data: null
 kind: ConfigMap
 metadata:
   labels:
