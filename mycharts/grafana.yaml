@@ -4,7 +4,8 @@ metadata:
   labels:
     app: grafana
     release: grafana
-  name: grafana-test
+  name: grafana
+  namespace: default
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -12,7 +13,7 @@ metadata:
   labels:
     app: grafana
     release: grafana
-  name: grafana
+  name: grafana-test
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -38,6 +39,7 @@ metadata:
     app: grafana
     release: grafana
   name: grafana
+  namespace: default
 rules:
 - apiGroups:
   - extensions
@@ -80,6 +82,7 @@ metadata:
     app: grafana
     release: grafana
   name: grafana
+  namespace: default
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -107,22 +110,6 @@ subjects:
 ---
 apiVersion: v1
 data:
-  run.sh: |-
-    @test "Test Health" {
-      url="http://grafana/api/health"
-
-      code=$(curl -s -o /dev/null -I -w "%{http_code}" $url)
-      [ "$code" == "200" ]
-    }
-kind: ConfigMap
-metadata:
-  labels:
-    app: grafana
-    release: grafana
-  name: grafana-test
----
-apiVersion: v1
-data:
   grafana.ini: |
     [analytics]
     check_for_updates = true
@@ -141,10 +128,27 @@ metadata:
     app: grafana
     release: grafana
   name: grafana
+  namespace: default
 ---
 apiVersion: v1
 data:
-  admin-password: aDhHQkVJTGJsV01jcXdOMmFySTZrZlRxdkZNZnI4QUpzWUFFTHZwdw==
+  run.sh: |-
+    @test "Test Health" {
+      url="http://grafana/api/health"
+
+      code=$(curl -s -o /dev/null -I -w "%{http_code}" $url)
+      [ "$code" == "200" ]
+    }
+kind: ConfigMap
+metadata:
+  labels:
+    app: grafana
+    release: grafana
+  name: grafana-test
+---
+apiVersion: v1
+data:
+  admin-password: SzZ6ck9hQTJBSllrbjlBcXFNMHhNUFZlRnpkMU13TmRlUVpzNzFPcQ==
   admin-user: YWRtaW4=
   ldap-toml: ""
 kind: Secret
@@ -153,6 +157,7 @@ metadata:
     app: grafana
     release: grafana
   name: grafana
+  namespace: default
 type: Opaque
 ---
 apiVersion: v1
@@ -162,6 +167,7 @@ metadata:
     app: grafana
     release: grafana
   name: grafana
+  namespace: default
 spec:
   ports:
   - name: service
@@ -180,6 +186,7 @@ metadata:
     app: grafana
     release: grafana
   name: grafana
+  namespace: default
 spec:
   replicas: 50
   selector:
@@ -191,10 +198,10 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: ad2b73604d7d34d12c9eb67d12b9671174bb1f0433c5ad3761b0a921aa38685a
+        checksum/config: 3848ce0c05ab146d87097775c0545febd39763eee66651bf3a3dfc01a2c7b4c7
         checksum/dashboards-json-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
         checksum/sc-dashboard-provider-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
-        checksum/secret: 4a3e9ee913403b1514750fd50241ed27800dc01c14eeb67759ce64572eadca5e
+        checksum/secret: 5a113653a5feb8bc39c5fb985920661a8698566d14e06323a6dd92306410e241
       labels:
         app: grafana
         release: grafana
@@ -262,34 +269,6 @@ spec:
 apiVersion: extensions/v1beta1
 kind: PodSecurityPolicy
 metadata:
-  labels:
-    app: grafana
-    release: grafana
-  name: grafana-test
-spec:
-  allowPrivilegeEscalation: true
-  fsGroup:
-    rule: RunAsAny
-  hostIPC: false
-  hostNetwork: false
-  hostPID: false
-  privileged: false
-  runAsUser:
-    rule: RunAsAny
-  seLinux:
-    rule: RunAsAny
-  supplementalGroups:
-    rule: RunAsAny
-  volumes:
-  - configMap
-  - downwardAPI
-  - emptyDir
-  - projected
-  - secret
----
-apiVersion: extensions/v1beta1
-kind: PodSecurityPolicy
-metadata:
   annotations:
     apparmor.security.beta.kubernetes.io/allowedProfileNames: runtime/default
     apparmor.security.beta.kubernetes.io/defaultProfileName: runtime/default
@@ -299,6 +278,7 @@ metadata:
     app: grafana
     release: grafana
   name: grafana
+  namespace: default
 spec:
   allowPrivilegeEscalation: false
   fsGroup:
@@ -334,6 +314,34 @@ spec:
   - secret
   - downwardAPI
   - persistentVolumeClaim
+---
+apiVersion: extensions/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  labels:
+    app: grafana
+    release: grafana
+  name: grafana-test
+spec:
+  allowPrivilegeEscalation: true
+  fsGroup:
+    rule: RunAsAny
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  privileged: false
+  runAsUser:
+    rule: RunAsAny
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  volumes:
+  - configMap
+  - downwardAPI
+  - emptyDir
+  - projected
+  - secret
 ---
 apiVersion: v1
 kind: Pod
