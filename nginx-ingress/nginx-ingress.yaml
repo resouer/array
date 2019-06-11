@@ -174,16 +174,6 @@ subjects:
   namespace: default
 ---
 apiVersion: v1
-data: null
-kind: ConfigMap
-metadata:
-  labels:
-    app: nginx-ingress
-    component: controller
-    release: nginx-ingress
-  name: nginx-ingress-controller
----
-apiVersion: v1
 kind: Service
 metadata:
   labels:
