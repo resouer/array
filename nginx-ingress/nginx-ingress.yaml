@@ -174,17 +174,6 @@ subjects:
   namespace: default
 ---
 apiVersion: v1
-data:
-  enable-vts-status: "false"
-kind: ConfigMap
-metadata:
-  labels:
-    app: nginx-ingress
-    component: controller
-    release: nginx-ingress
-  name: nginx-ingress-controller
----
-apiVersion: v1
 kind: Service
 metadata:
   labels:
@@ -329,7 +318,7 @@ spec:
     spec:
       containers:
       - args: []
-        image: k8s.gcr.io/defaultbackend:1.4
+        image: k8s.gcr.io/defaultbackend-amd64:1.5
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
