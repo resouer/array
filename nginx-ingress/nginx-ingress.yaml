@@ -333,5 +333,6 @@ spec:
           name: http
           protocol: TCP
         resources: {}
-      serviceAccountName: nginx-ingress
+        securityContext:
+          runAsUser: 65534
       terminationGracePeriodSeconds: 60
