@@ -325,17 +325,30 @@ spec:
         image: k8s.gcr.io/defaultbackend-amd64:1.5
         imagePullPolicy: IfNotPresent
         livenessProbe:
+          failureThreshold: 3
           httpGet:
             path: /healthz
             port: 8080
             scheme: HTTP
           initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
           timeoutSeconds: 5
         name: nginx-ingress-default-backend
         ports:
         - containerPort: 8080
           name: http
           protocol: TCP
+        readinessProbe:
+          failureThreshold: 6
+          httpGet:
+            path: /healthz
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 0
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 5
         resources: {}
         securityContext:
           runAsUser: 65534
