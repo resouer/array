@@ -231,7 +231,7 @@ spec:
     release: nginx-ingress
   type: ClusterIP
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
@@ -243,6 +243,10 @@ spec:
   minReadySeconds: 0
   replicas: 1
   revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: nginx-ingress
+      release: nginx-ingress
   strategy: {}
   template:
     metadata:
@@ -311,7 +315,7 @@ spec:
       serviceAccountName: nginx-ingress
       terminationGracePeriodSeconds: 60
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
@@ -322,6 +326,10 @@ metadata:
 spec:
   replicas: 1
   revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: nginx-ingress
+      release: nginx-ingress
   template:
     metadata:
       labels:
