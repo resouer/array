@@ -152,7 +152,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  admin-password: ME1NZDk4VGxMVlhpclBLTG1LaFpJZXp0eU1ybjZ3VEs5VDhUMTNhSg==
+  admin-password: eXUwSkFuYkwwWWtXSjlGRzZZaGMyQ3dBZEpsYk0xRjRrUml0VkF6dw==
   admin-user: YWRtaW4=
   ldap-toml: ""
 kind: Secret
@@ -202,10 +202,10 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 9cb9d0f0ee424945c77a0bf0e0b28ef11ce015b3e40c3bab3896340ace1f12af
+        checksum/config: 3db6b3e465bdd458f8821d87723d01181005a9fe764d2af0c4e80edd85e7fa43
         checksum/dashboards-json-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
         checksum/sc-dashboard-provider-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
-        checksum/secret: 8f8af2b86469391981ed6f2b8562e1f3a15932639b1937e2d8a16ebce03ce090
+        checksum/secret: b51db223bf98462c0b170d93c66b861ae24c364257124e56871b64b3e35e4376
       labels:
         app: grafana
         release: grafana
@@ -248,9 +248,6 @@ spec:
         - mountPath: /etc/grafana/grafana.ini
           name: config
           subPath: grafana.ini
-        - mountPath: /etc/grafana/ldap.toml
-          name: ldap
-          subPath: ldap.toml
         - mountPath: /var/lib/grafana
           name: storage
       securityContext:
@@ -261,12 +258,6 @@ spec:
       - configMap:
           name: grafana
         name: config
-      - name: ldap
-        secret:
-          items:
-          - key: ldap-toml
-            path: ldap.toml
-          secretName: grafana
       - emptyDir: {}
         name: storage
 ---
