@@ -4,7 +4,35 @@ metadata:
   labels:
     app: grafana
     release: grafana
+  name: grafana-test
+  namespace: default
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: grafana
+    release: grafana
   name: grafana
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app: grafana
+    release: grafana
+  name: grafana-test
+  namespace: default
+rules:
+- apiGroups:
+  - policy
+  resourceNames:
+  - grafana-test
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
@@ -13,6 +41,7 @@ metadata:
     app: grafana
     release: grafana
   name: grafana
+  namespace: default
 rules:
 - apiGroups:
   - extensions
@@ -32,6 +61,23 @@ metadata:
   name: grafana-clusterrole
 rules: []
 ---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app: grafana
+    release: grafana
+  name: grafana-test
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: grafana-test
+subjects:
+- kind: ServiceAccount
+  name: grafana-test
+  namespace: default
+---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
@@ -39,6 +85,7 @@ metadata:
     app: grafana
     release: grafana
   name: grafana
+  namespace: default
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -66,6 +113,23 @@ subjects:
 ---
 apiVersion: v1
 data:
+  run.sh: |-
+    @test "Test Health" {
+      url="http://grafana/api/health"
+
+      code=$(curl -s -o /dev/null -I -w "%{http_code}" $url)
+      [ "$code" == "200" ]
+    }
+kind: ConfigMap
+metadata:
+  labels:
+    app: grafana
+    release: grafana
+  name: grafana-test
+  namespace: default
+---
+apiVersion: v1
+data:
   grafana.ini: |
     [analytics]
     check_for_updates = true
@@ -84,10 +148,11 @@ metadata:
     app: grafana
     release: grafana
   name: grafana
+  namespace: default
 ---
 apiVersion: v1
 data:
-  admin-password: MXR3V0ozNlRKMmZ5SW9iQ3l4THR0a1llQjJwWGYyNWJ1cWVONDllUQ==
+  admin-password: bGs5Z3FkeGdVQXRrQUlXcHEyUTVUNk9ZWFVZa1ZxdjBlMXppYTlXRA==
   admin-user: YWRtaW4=
   ldap-toml: ""
 kind: Secret
@@ -96,6 +161,7 @@ metadata:
     app: grafana
     release: grafana
   name: grafana
+  namespace: default
 type: Opaque
 ---
 apiVersion: v1
@@ -105,6 +171,7 @@ metadata:
     app: grafana
     release: grafana
   name: grafana
+  namespace: default
 spec:
   ports:
   - name: service
@@ -116,15 +183,16 @@ spec:
     release: grafana
   type: ClusterIP
 ---
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
     app: grafana
     release: grafana
   name: grafana
+  namespace: default
 spec:
-  replicas: 50
+  replicas: 1
   selector:
     matchLabels:
       app: grafana
@@ -133,6 +201,11 @@ spec:
     type: RollingUpdate
   template:
     metadata:
+      annotations:
+        checksum/config: 64bc1a95aee42bf181baa9987e6fefca53a9c772d3660775765d9f7ec11f461b
+        checksum/dashboards-json-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
+        checksum/sc-dashboard-provider-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
+        checksum/secret: 6570de600cb8a39818c764ada4c0327c53ebdea37fafd3816b31ab0adf86f2a4
       labels:
         app: grafana
         release: grafana
@@ -149,7 +222,7 @@ spec:
             secretKeyRef:
               key: admin-password
               name: grafana
-        image: grafana/grafana:6.0.2
+        image: grafana/grafana:6.4.2
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 10
@@ -175,9 +248,6 @@ spec:
         - mountPath: /etc/grafana/grafana.ini
           name: config
           subPath: grafana.ini
-        - mountPath: /etc/grafana/ldap.toml
-          name: ldap
-          subPath: ldap.toml
         - mountPath: /var/lib/grafana
           name: storage
       securityContext:
@@ -188,16 +258,39 @@ spec:
       - configMap:
           name: grafana
         name: config
-      - name: ldap
-        secret:
-          items:
-          - key: ldap-toml
-            path: ldap.toml
-          secretName: grafana
       - emptyDir: {}
         name: storage
 ---
-apiVersion: extensions/v1beta1
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  labels:
+    app: grafana
+    release: grafana
+  name: grafana-test
+  namespace: default
+spec:
+  allowPrivilegeEscalation: true
+  fsGroup:
+    rule: RunAsAny
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  privileged: false
+  runAsUser:
+    rule: RunAsAny
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  volumes:
+  - configMap
+  - downwardAPI
+  - emptyDir
+  - projected
+  - secret
+---
+apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
   annotations:
@@ -209,6 +302,7 @@ metadata:
     app: grafana
     release: grafana
   name: grafana
+  namespace: default
 spec:
   allowPrivilegeEscalation: false
   fsGroup:
@@ -244,3 +338,49 @@ spec:
   - secret
   - downwardAPI
   - persistentVolumeClaim
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    helm.sh/hook: test-success
+  labels:
+    app: grafana
+    release: grafana
+  name: grafana-test
+  namespace: default
+spec:
+  containers:
+  - command:
+    - /tools/bats/bats
+    - -t
+    - /tests/run.sh
+    image: dduportal/bats:0.4.0
+    name: grafana-test
+    volumeMounts:
+    - mountPath: /tests
+      name: tests
+      readOnly: true
+    - mountPath: /tools
+      name: tools
+  initContainers:
+  - command:
+    - bash
+    - -c
+    - |
+      set -ex
+      # copy bats to tools dir
+      cp -R /usr/local/libexec/ /tools/bats/
+    image: dduportal/bats:0.4.0
+    name: test-framework
+    volumeMounts:
+    - mountPath: /tools
+      name: tools
+  restartPolicy: Never
+  serviceAccountName: grafana-test
+  volumes:
+  - configMap:
+      name: grafana-test
+    name: tests
+  - emptyDir: {}
+    name: tools
