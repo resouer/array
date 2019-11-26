@@ -194,7 +194,6 @@ metadata:
     release: nginx-ingress
   name: nginx-ingress-controller
 spec:
-  clusterIP: ""
   ports:
   - name: http
     port: 80
@@ -219,7 +218,6 @@ metadata:
     release: nginx-ingress
   name: nginx-ingress-default-backend
 spec:
-  clusterIP: ""
   ports:
   - name: http
     port: 80
