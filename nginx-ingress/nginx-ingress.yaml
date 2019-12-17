@@ -232,6 +232,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  annotations: {}
   labels:
     app: nginx-ingress
     component: controller
