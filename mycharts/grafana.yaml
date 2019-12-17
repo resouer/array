@@ -152,7 +152,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  admin-password: dTFDSW15SmRrazJLbDc0cDN3V0tUcmZEQnFwa2xScVZLeVBhTjkxWA==
+  admin-password: cE92eG1yUDBJN0RTNHRQQXRGc3AzcGVkQzhpTnZBQTBGeXFEQzZGNQ==
   admin-user: YWRtaW4=
   ldap-toml: ""
 kind: Secret
@@ -202,10 +202,10 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 8e528d651b83f397428ee4292f66775d23637e318bea2632113f3019c63bf47a
+        checksum/config: a13a908ff6c8626dca14081bec3a4d74068a89c9732db840f406e2b4c78be69f
         checksum/dashboards-json-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
         checksum/sc-dashboard-provider-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
-        checksum/secret: e80b7bb496b9edd03e80eccf63af608b047629a3b73174b2e432fc3c9d95ba9d
+        checksum/secret: f8bf3a32d34685a707d2da974e38ad78e08343b6b9a97ec769f4f538cbf8ab54
       labels:
         app: grafana
         release: grafana
@@ -222,7 +222,7 @@ spec:
             secretKeyRef:
               key: admin-password
               name: grafana
-        image: grafana/grafana:6.5.0
+        image: grafana/grafana:6.5.2
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 10
