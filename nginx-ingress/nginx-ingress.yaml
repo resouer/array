@@ -235,7 +235,7 @@ metadata:
   annotations: {}
   labels:
     app: nginx-ingress
-    component: controller
+    app.kubernetes.io/component: controller
     release: nginx-ingress
   name: nginx-ingress-controller
 spec:
@@ -251,7 +251,7 @@ spec:
     metadata:
       labels:
         app: nginx-ingress
-        component: controller
+        app.kubernetes.io/component: controller
         release: nginx-ingress
     spec:
       containers:
@@ -319,7 +319,7 @@ kind: Deployment
 metadata:
   labels:
     app: nginx-ingress
-    component: default-backend
+    app.kubernetes.io/component: default-backend
     release: nginx-ingress
   name: nginx-ingress-default-backend
 spec:
@@ -333,7 +333,7 @@ spec:
     metadata:
       labels:
         app: nginx-ingress
-        component: default-backend
+        app.kubernetes.io/component: default-backend
         release: nginx-ingress
     spec:
       containers:
