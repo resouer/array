@@ -205,7 +205,7 @@ spec:
     targetPort: https
   selector:
     app: nginx-ingress
-    component: controller
+    app.kubernetes.io/component: controller
     release: nginx-ingress
   type: LoadBalancer
 ---
@@ -225,7 +225,7 @@ spec:
     targetPort: http
   selector:
     app: nginx-ingress
-    component: default-backend
+    app.kubernetes.io/component: default-backend
     release: nginx-ingress
   type: ClusterIP
 ---
